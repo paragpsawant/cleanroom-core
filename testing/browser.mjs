@@ -21,7 +21,8 @@ export async function openApp(base, { shotsDir, viewport = { width: 1440, height
   const problems = [];
   const onRequest = (r) => {
     const u = new URL(r.url());
-    if (["blob:", "data:"].includes(u.protocol)) return;
+    // blob:/data: are in-page; edge://, chrome:// etc. are the browser's own UI (e.g. the downloads panel).
+    if (!["http:", "https:", "ws:", "wss:"].includes(u.protocol)) return;
     if (r.method() !== "GET" || r.postData()) uploads.push(`${r.method()} ${r.url()}`);
     if (!allowedHost(u.host)) external.push(r.url());
   };
