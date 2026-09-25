@@ -24,7 +24,12 @@ export function pkgDir(name, appDir) {
       const req = createRequire(join(from, "package.json"));
       return dirname(req.resolve(`${name}/package.json`));
     } catch {
-      // try next
+      // Packages whose "exports" hide package.json: walk node_modules directly.
+      for (let dir = from; ; dir = dirname(dir)) {
+        const candidate = join(dir, "node_modules", ...name.split("/"));
+        if (existsSync(join(candidate, "package.json"))) return candidate;
+        if (dirname(dir) === dir) break;
+      }
     }
   }
   throw new Error(`package ${name} is not installed`);
