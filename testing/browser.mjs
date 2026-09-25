@@ -13,6 +13,9 @@ export async function openApp(base, { shotsDir, viewport = { width: 1440, height
     ...(channel === "chromium" ? {} : { channel }), headless: !process.env.HEADED,
   });
   const context = await browser.newContext({ viewport, acceptDownloads: true });
+  // Generous defaults: CI runners and busy dev machines can be slow to start pages and workers.
+  context.setDefaultTimeout(Number(process.env.E2E_TIMEOUT_MS || 90_000));
+  context.setDefaultNavigationTimeout(Number(process.env.E2E_TIMEOUT_MS || 90_000));
   const page = await context.newPage();
   const baseHost = new URL(base).host;
   const allowedHost = (h) => h === baseHost || /(^|\.)hf\.co$/.test(h);

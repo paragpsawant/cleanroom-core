@@ -1,6 +1,6 @@
 {
   "name": "@cleanroom-ai/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Shared in-browser engine for cleanroom-ai tools: secret/PII rules, OCR, face and name detection on ONNX Runtime Web.",
   "license": "Apache-2.0",
   "type": "module",
