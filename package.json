@@ -1,0 +1,27 @@
+{
+  "name": "@cleanroom-ai/core",
+  "version": "0.1.0",
+  "description": "Shared in-browser engine for cleanroom-ai tools: secret/PII rules, OCR, face and name detection on ONNX Runtime Web.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "author": "Parag Sawant (https://github.com/paragpsawant)",
+  "repository": { "type": "git", "url": "https://github.com/cleanroom-ai/core" },
+  "exports": {
+    "./src/*": "./src/*",
+    "./scripts/*": "./scripts/*",
+    "./testing/*": "./testing/*",
+    "./theme/*": "./theme/*",
+    "./models/*": "./models/*",
+    "./package.json": "./package.json"
+  },
+  "files": ["src", "scripts", "testing", "theme", "models", "licenses", "LICENSE", "README.md"],
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\""
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.3.0",
+    "jsqr": "1.4.0",
+    "onnxruntime-web": "1.30.0",
+    "playwright-core": "1.63.0"
+  }
+}
