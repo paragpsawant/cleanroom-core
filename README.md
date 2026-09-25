@@ -1,5 +1,7 @@
 # @cleanroom-ai/core
 
+[![CI](https://github.com/paragpsawant/cleanroom-core/actions/workflows/ci.yml/badge.svg)](https://github.com/paragpsawant/cleanroom-core/actions/workflows/ci.yml)
+
 Shared in-browser engine behind the [cleanroom-ai](https://github.com/cleanroom-ai) tools: *clean it
 before you share it*, 100% on your device.
 
@@ -28,3 +30,4 @@ npm test        # 75 tests: rules + full pipeline on the real bundled models (No
 ```
 
 Built by **Parag Sawant** ([@paragpsawant](https://github.com/paragpsawant)). Apache-2.0.
+

@@ -5,7 +5,10 @@
   "license": "Apache-2.0",
   "type": "module",
   "author": "Parag Sawant (https://github.com/paragpsawant)",
-  "repository": { "type": "git", "url": "https://github.com/cleanroom-ai/core" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paragpsawant/cleanroom-core"
+  },
   "exports": {
     "./src/*": "./src/*",
     "./scripts/*": "./scripts/*",
@@ -14,7 +17,16 @@
     "./models/*": "./models/*",
     "./package.json": "./package.json"
   },
-  "files": ["src", "scripts", "testing", "theme", "models", "licenses", "LICENSE", "README.md"],
+  "files": [
+    "src",
+    "scripts",
+    "testing",
+    "theme",
+    "models",
+    "licenses",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "node --test \"tests/*.test.mjs\""
   },
