@@ -42,7 +42,25 @@ export function copy(src, dst, quiet = false) {
   if (!quiet) console.log("  ", dst);
 }
 
+/**
+ * Fail the build if the installed core is not the version the app asks for. npm keeps a git
+ * dependency's locked commit on a plain `npm install`, so bumping the tag in package.json alone
+ * silently ships the old engine; this turns that into a loud error.
+ */
+export function assertCoreVersion(appDir) {
+  const app = JSON.parse(readFileSync(join(appDir, "package.json"), "utf8"));
+  const spec = app.dependencies?.["@cleanroom-ai/core"] ?? app.devDependencies?.["@cleanroom-ai/core"];
+  const wanted = spec?.match(/#v?(\d+\.\d+\.\d+)$/)?.[1];
+  if (!wanted) return;
+  const installed = JSON.parse(readFileSync(join(coreDir, "package.json"), "utf8")).version;
+  if (installed !== wanted) {
+    throw new Error(`@cleanroom-ai/core ${installed} is installed but package.json asks for v${wanted}. ` +
+      `Run: npm install "@cleanroom-ai/core@github:cleanroom-ai/cleanroom-core#v${wanted}"`);
+  }
+}
+
 export function vendorCore({ appDir, models = [], libs = ["ort"] }) {
+  assertCoreVersion(appDir);
   const out = (...p) => join(appDir, ...p);
   const lic = out("licenses");
   mkdirSync(lic, { recursive: true });

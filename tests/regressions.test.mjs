@@ -125,3 +125,28 @@ test("PERF-005: model fetches use Cache Storage by original URL", async () => {
     globalThis.caches = oldCaches;
   }
 });
+
+// v0.1.6: the linear email/IPv6 scanners from v0.1.4 dropped quoted/JSON addresses and addresses
+// followed by sentence punctuation. Every value must be detected in every common wrapping.
+test("v0.1.6: emails, phones, cards, IPs and keys survive every common wrapping", () => {
+  const vals = {
+    EMAIL: ["tom.oneill@example.org", "a@b.co", "jane.doe+work@example.co.uk", "OPS-LEAD@CONTOSO.COM"],
+    PHONE: ["(415) 555-0132", "+44 20 7946 0958"],
+    CREDIT_CARD: ["4111 1111 1111 1111", "4111111111111111"],
+    IP_ADDRESS: ["203.0.113.42", "2001:db8::1"],
+    AWS_ACCESS_KEY: [j("AK", "IA", "IOSFODNN7", "EXAMPLE")],
+  };
+  const wraps = [(v) => v, (v) => `"${v}"`, (v) => `'${v}'`, (v) => `(${v})`, (v) => `<${v}>`, (v) => `${v}.`, (v) => `${v},`,
+    (v) => `${v}...`, (v) => `{"k": "${v}"}`, (v) => `k=${v}`, (v) => `k="${v}"`, (v) => `<k>${v}</k>`, (v) => `line1\n${v}\nline3`,
+    (v) => `${v}\r\n`, (v) => `|${v}|`, (v) => `\`${v}\``];
+  const misses = [];
+  for (const [label, list] of Object.entries(vals)) for (const v of list) for (const w of wraps) {
+    const t = "prefix " + w(v) + " suffix", at = t.indexOf(v);
+    if (!findSpans(t).some((s) => s.label === label && s.start <= at && s.end >= at + v.length)) misses.push(`${label} ${JSON.stringify(w(v))}`);
+  }
+  assert.deepEqual(misses, []);
+  assert.equal(spans('{"email": "tom.oneill@example.org", "retry_count": 3}').find((s) => s.label === "EMAIL")?.text, "tom.oneill@example.org");
+  assert.equal(spans("Email me at tom@example.org.").find((s) => s.label === "EMAIL")?.text, "tom@example.org");
+  assert.equal(spans("zone fe80::1%eth0.").find((s) => s.label === "IP_ADDRESS")?.text, "fe80::1%eth0");
+  for (const bad of ["not-an-email@", "a@b", "x@y.c", "foo@bar..com", "user@-bad.com", "a..b@example.com"]) assert.deepEqual(spans(bad).filter((s) => s.label === "EMAIL"), [], bad);
+});
