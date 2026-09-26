@@ -166,8 +166,8 @@ export const RULES = [
     String.raw`\b(?:driver'?s?\s*licen[sc]e|DL)` + ID_LABEL + String.raw`([A-Z0-9-]{5,15})\b`, 1, null, "i"),
   // contact
   rule("EMAIL", "contact", String.raw`\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b`),
-  rule("PHONE", "contact", String.raw`\+\d{1,3}[\s.-]?\(?\d{1,4}\)?(?:[\s.-]?\d{2,4}){2,4}\b`, 0, phoneOk),
-  rule("PHONE", "contact", String.raw`(?:\(\d{3}\)\s?|\b\d{3}[\s.-])\d{3}[\s.-]\d{4}\b`, 0, phoneOk),
+  rule("PHONE", "contact", String.raw`\+\d{1,3}[ \t.-]?\(?\d{1,4}\)?(?:[ \t.-]?\d{2,4}){2,4}\b`, 0, phoneOk),
+  rule("PHONE", "contact", String.raw`(?:\(\d{3}\)[ \t]?|\b\d{3}[ \t.-])\d{3}[ \t.-]\d{4}\b`, 0, phoneOk),
   // people: chat headers ("Parag Sawant  Yesterday 12:02 PM"), @mentions, greetings, "From: …" labels
   rule("PERSON", "person", String.raw`^\s*(${FULL_NAME})(?:\s*\([^)]{1,40}\))?(?:\s+|(?=${GLUE}))${TIMESTAMP}\s*$`, 1, null, "u"),
   rule("PERSON", "person", String.raw`(?<![\w.])@(${NAME})`, 1, null, "u"),

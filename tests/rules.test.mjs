@@ -128,3 +128,9 @@ for (const text of NOT_PEOPLE) {
   test(`no person false positive: ${text}`, () => assert.deepEqual(findSpans(text, ["person"]), []));
 }
 
+
+test("phone numbers never run across a line break", () => {
+  const text = "callback phone=+1 (415) 555-0132\n14:02:15 INFO status=200\nfax (212) 555-0199\n2026 report";
+  const phones = labels(text).filter(([l]) => l === "PHONE").map(([, v]) => v);
+  assert.deepEqual(phones, ["+1 (415) 555-0132", "(212) 555-0199"]);
+});
