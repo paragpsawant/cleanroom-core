@@ -7,14 +7,14 @@ before you share it*, 100% on your device.
 
 | Module | What |
 |---|---|
-| `src/rules.js` | Secret & PII rules with checksums (API keys, passwords incl. spaces, emails, phones, cards, IBANs, SSNs, IPs, chat-header names, …) |
+| `src/rules.js` | Secret & PII rules with checksums (API/vendor tokens, password fields incl. XML/escaped JSON/spaces, emails incl. IDN/quoted forms, phones, cards, IBANs, SSNs, IP/MAC addresses, chat-header names, …) |
 | `src/ner.js` | On-device PII token classifier (bert-small-pii, int8) with span clean-up |
 | `src/ocr.js` | PP-OCRv6 tiny text detection + recognition with per-character positions |
 | `src/faces.js` | YuNet face detection, with full-resolution tiles for small avatars |
 | `src/pipeline.js` | Image scan: OCR → rows → rules + names → pixel boxes; faces |
 | `src/redact.js` | Canvas rendering: black box / pixelate / blur, numbered review overlay |
 | `src/codes.js` | QR / barcode detection (BarcodeDetector or bundled jsQR) |
-| `src/engines.js` | Worker helpers: progress fetch of bundled models, lazy engines, ORT config |
+| `src/engines.js` | Worker helpers: Cache Storage-backed progress fetch of bundled models, lazy engines, ORT config |
 | `scripts/vendor.mjs` | Copies libraries + models into an app (no CDN at runtime) |
 | `scripts/serve.mjs` | Local static server with Space-like headers |
 | `scripts/render-icons.mjs` | App icon set, favicon.ico and 1280×640 social card from two SVGs |

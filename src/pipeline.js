@@ -30,12 +30,31 @@ export async function scan(img, engines, { categories, customTerms = [], useNer 
     const useModel = useNer && engines.ner && nerCats.size;
     if (useModel) onProgress("Looking for names and addresses…");
     t = now();
-    for (const row of groupRows(lines)) {
+    const rows = groupRows(lines);
+    for (const row of rows) {
       const ruleSpans = findSpans(row.text, [...cats], terms);
       const nerSpans = useModel ? await engines.ner.find(row.text, nerCats) : [];
       for (const s of mergeSpans(ruleSpans, nerSpans)) {
         add({ category: s.category, label: s.label, box: rowSpanBox(row, s.start, s.end), score: s.score,
           source: s.source, text: row.text.slice(s.start, s.end) });
+      }
+      const compact = compactRow(row);
+      if (compact.text !== row.text) {
+        for (const s of findSpans(compact.text, [...cats], terms)) {
+          const box = rowSpanBox(compact, s.start, s.end);
+          if (!detections.some((d) => overlaps(d.box, box))) {
+            add({ category: s.category, label: s.label, box, score: s.score, source: s.source,
+              text: compact.text.slice(s.start, s.end) });
+          }
+        }
+      }
+    }
+    const document = documentRow(rows);
+    if (document.text.includes("\n")) {
+      for (const s of findSpans(document.text, [...cats], terms)) {
+        if (!document.text.slice(s.start, s.end).includes("\n")) continue;
+        add({ category: s.category, label: s.label, box: rowSpanBox(document, s.start, s.end), score: s.score,
+          source: s.source, text: document.text.slice(s.start, s.end) });
       }
     }
     if (cats.has("secrets")) {
@@ -70,11 +89,16 @@ export function labelledValues(lines, labelRe, maxGapInHeights = 20) {
   for (const label of lines) {
     if (!labelRe.test(label.text)) continue;
     const h = label.box.y1 - label.box.y0;
-    const candidates = lines.filter((l) => l !== label && l.box.x0 >= label.box.x1 - 0.5 * h &&
+    const right = lines.filter((l) => l !== label && l.box.x0 >= label.box.x1 - 0.5 * h &&
       l.box.x0 - label.box.x1 <= maxGapInHeights * h &&
       Math.min(l.box.y1, label.box.y1) - Math.max(l.box.y0, label.box.y0) >= 0.5 * Math.min(h, l.box.y1 - l.box.y0));
-    candidates.sort((a, b) => a.box.x0 - b.box.x0);
-    if (candidates[0] && candidates[0].text.trim().length >= 3) out.push({ label, line: candidates[0] });
+    right.sort((a, b) => a.box.x0 - b.box.x0);
+    const below = lines.filter((l) => l !== label && l.box.y0 >= label.box.y1 - 0.25 * h &&
+      l.box.y0 - label.box.y1 <= 3 * h &&
+      Math.min(l.box.x1, label.box.x1) - Math.max(l.box.x0, label.box.x0) >= -0.25 * h);
+    below.sort((a, b) => a.box.y0 - b.box.y0 || a.box.x0 - b.box.x0);
+    const candidate = right[0] ?? below[0];
+    if (candidate && candidate.text.trim().length >= 3) out.push({ label, line: candidate });
   }
   return out;
 }
@@ -107,6 +131,28 @@ export function groupRows(lines, maxGapInHeights = 2.5) {
     }
   }
   return rows.sort((a, b) => a.parts[0].line.box.y0 - b.parts[0].line.box.y0 || a.parts[0].line.box.x0 - b.parts[0].line.box.x0);
+}
+
+function compactRow(row) {
+  let text = "";
+  const parts = [];
+  for (const { line } of row.parts) {
+    parts.push({ line, offset: text.length });
+    text += line.text;
+  }
+  return { text, parts };
+}
+
+function documentRow(rows) {
+  let text = "";
+  const parts = [];
+  for (const row of rows) {
+    if (text) text += "\n";
+    const base = text.length;
+    for (const part of row.parts) parts.push({ line: part.line, offset: base + part.offset });
+    text += row.text;
+  }
+  return { text, parts };
 }
 
 /** Pixel box covering row.text[start:end], which may span several OCR boxes. */
