@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">cleanroom-ai</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#312e81"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a5b4fc"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <!-- shield: on-device, nothing leaves -->
+  <path d="M256 84 L398 136 V246 C398 336 338 400 256 432 C174 400 114 336 114 246 V136 Z"
+        fill="#0b1020" stroke="url(#edge)" stroke-width="16" stroke-linejoin="round"/>
+  <!-- content lines, one already redacted -->
+  <rect x="168" y="190" width="176" height="22" rx="11" fill="#94a3b8"/>
+  <rect x="156" y="232" width="200" height="52" rx="14" fill="url(#edge)"/>
+  <rect x="184" y="304" width="144" height="22" rx="11" fill="#64748b"/>
+  <!-- sparkle: clean -->
+  <path d="M372 88 C376 112 384 120 408 124 C384 128 376 136 372 160 C368 136 360 128 336 124 C360 120 368 112 372 88 Z" fill="#f8fafc"/>
+  <path d="M420 164 C422 176 426 180 438 182 C426 184 422 188 420 200 C418 188 414 184 402 182 C414 180 418 176 420 164 Z" fill="#67e8f9"/>
+</svg>
