@@ -7,7 +7,7 @@
   "author": "Parag Sawant (https://github.com/paragpsawant)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/paragpsawant/cleanroom-core"
+    "url": "https://github.com/cleanroom-ai/cleanroom-core"
   },
   "exports": {
     "./src/*": "./src/*",
