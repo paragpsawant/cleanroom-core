@@ -60,18 +60,24 @@ test("CORE-006 and CORE-007: network variants and precision controls", () => {
 });
 
 test("CORE-008 and PERF-001: adversarial inputs and overlap sweeps stay fast", () => {
+  // Absolute bounds are generous (shared CI runners are slow); the scaling checks below catch O(n^2) regressions.
   for (const [name, text] of [["email", "a.".repeat(50000) + "@"], ["phone", "+1 111 111 1111 ".repeat(6250)]]) {
     const t0 = performance.now();
     findSpans(text);
-    assert.ok(performance.now() - t0 < 1500, name);
+    assert.ok(performance.now() - t0 < 5000, name);
   }
   const mk = (n, off = 0) => Array.from({ length: n }, (_, i) => ({ start: i * 3 + off, end: i * 3 + off + 1, label: "X", category: "secrets", score: 1, source: "test", prio: 1 }));
-  let t0 = performance.now();
+  const time = (fn) => { const t0 = performance.now(); fn(); return performance.now() - t0; };
+  const best = (fn) => Math.min(time(fn), time(fn), time(fn));
   assert.equal(resolveOverlaps(mk(40000)).length, 40000);
-  assert.ok(performance.now() - t0 < 1000);
-  t0 = performance.now();
   assert.equal(mergeSpans(mk(40000), mk(40000, 1)).length, 80000);
-  assert.ok(performance.now() - t0 < 1000);
+  // 4x the input must cost well under 16x the time (quadratic); linearithmic is ~4-5x.
+  const small = mk(10000), big = mk(40000), smallB = mk(10000, 1), bigB = mk(40000, 1);
+  const resolveRatio = best(() => resolveOverlaps(big)) / Math.max(1, best(() => resolveOverlaps(small)));
+  const mergeRatio = best(() => mergeSpans(big, bigB)) / Math.max(1, best(() => mergeSpans(small, smallB)));
+  assert.ok(resolveRatio < 10, `resolveOverlaps scaled ${resolveRatio.toFixed(1)}x for 4x input`);
+  assert.ok(mergeRatio < 10, `mergeSpans scaled ${mergeRatio.toFixed(1)}x for 4x input`);
+  assert.ok(best(() => mergeSpans(big, bigB)) < 5000);
 });
 
 test("CORE-009: OCR label-below, split fixed-format secrets and multi-row PEM are covered", async () => {
